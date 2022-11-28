@@ -55,7 +55,7 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 				sscanf(buf, "host: %s", host);
 			}
 		}
-		printf("%s\n", buf);
+		// printf("%s\n", buf);
 	}while (len > 0);
 	sscanf(host, "%[^:]", host);
 	printf("host: %s\n", host);
