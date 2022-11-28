@@ -37,7 +37,9 @@ int main() {
 		}
 		printf("I am pid %d\n", getpid());
 	}
-	// close_socket(sock_fd);
+	for (i=0; i<niginxxx->lists_num; ++i) {
+		close_socket(sock_fd[i]);
+	}
 	ng_destroy_instance(niginxxx);
 	printf("Niginxxx instance destroied success!\n");
 	return 0;

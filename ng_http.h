@@ -12,6 +12,7 @@
 
 #define MAX_URL_LENGTH 2083
 #define MAX_DOMAIN_LENGTH 253
+#define MAX_TCP_PACKAGE_SIZE 1024
 
 #define status_codes_200(protocol) #protocol " 200 OK\r\n"
 #define status_codes_400(protocol) #protocol " 400 BAD REQUEST\r\n"
