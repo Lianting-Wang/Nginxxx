@@ -1,6 +1,7 @@
 #ifndef NG_MAIN_H
 #define NG_MAIN_H
 
+#include <signal.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <unistd.h>
