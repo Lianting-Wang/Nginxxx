@@ -10,6 +10,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include "ng_http.h"
+
 #define OPTIONS_C 1
 #define GET_C 2
 #define HEAD_C 3

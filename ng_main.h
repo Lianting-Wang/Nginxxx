@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include "ng_readfile.h"
+#include "ng_http.h"
 
 /* forward declare */
 struct port_list;
