@@ -1,5 +1,12 @@
 #ifndef NG_METHOD_H
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+
 #define OPTIONS_C 1
 #define GET_C 2
 #define HEAD_C 3
@@ -17,5 +24,7 @@
 #define DELETE "DELETE"
 #define TRACE "TRACE"
 #define CONNECT "CONNECT"
+
+
 
 #endif
