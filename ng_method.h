@@ -6,6 +6,9 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #define OPTIONS_C 1
 #define GET_C 2

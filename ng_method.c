@@ -46,3 +46,26 @@ char * handle_get(char * path) {
 
 
 }
+
+int handle_post(int client_fd, char * path) {
+    FILE * fp = fopen(path, "r");
+    if (fp) {
+        // TODO send error for there already exists a file
+        close(fp);
+    }
+    int fd = open(path, O_CREAT);
+    if (fd == -1) {
+        // TODO error, send 5xx error back
+        return -1;
+    }
+    int len = 0;
+    do {
+        char buffer[1024];
+        len = read(client_fd, buffer, 1024);
+        len = write(fd, buffer, len);
+    } while (len > 0);
+    close(fd);
+
+    // TODO send client back the status and code
+    return 0 /* TODO change this status code */;
+}
