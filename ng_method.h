@@ -30,6 +30,7 @@
 #define TRACE "TRACE"
 #define CONNECT "CONNECT"
 
-
+int handle_post(int client_fd, char * path, int content_length);
+char * handle_get(char * path);
 
 #endif

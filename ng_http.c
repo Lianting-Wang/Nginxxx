@@ -28,6 +28,8 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 	char* params;		// Request params
 	char path[MAX_URL_LENGTH];  // File Address
 
+	int content_length = -1;
+
 	len = get_require_line(client_fd, buf, sizeof(buf));
 	if (len == 0) {
 		printf("request format error\n");
@@ -52,10 +54,14 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 		if (host[0] == '\0') {
 			sscanf(buf, "Host: %s", host);
 		}
-		// printf("%s\n", buf);
+		printf("%s\n", buf);
+		if (content_length == -1) {
+			sscanf(buf, "Content-Length: %d", &content_length);
+		}
 	}while (len > 0);
 	sscanf(host, "%[^:]", host);
 	printf("host: %s\n", host);
+	printf("content_legnth: %d\n", content_length);
 
 	// Matching virtual host id
 	int i = host_lists->id;
@@ -72,6 +78,13 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 	strcpy(path, hosts[i].root);
 	strcat(path, url_path);
 	printf("path: %s\n", path);
+
+	if (strcmp(method, POST) == 0) {
+		printf("handling post...\n");
+		handle_post(client_fd, path, content_length);
+		printf("handled post\n");
+		return;
+	}
 
 	// Determine if a file or directory exists
 	if (stat(path, &st) == -1){

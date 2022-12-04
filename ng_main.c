@@ -12,6 +12,7 @@ int main() {
 		if (!pid) {
 			printf("I am pid %d for port %d\n", getpid(), port_lists->port);
 			sock_fd[i] = listening_port(port_lists->port);
+			printf("Returned code: %d\n", sock_fd[i]);
 			break;
 		}
 		port_lists = port_lists->next;
