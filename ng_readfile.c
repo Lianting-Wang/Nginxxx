@@ -195,5 +195,17 @@ struct niginxxx_instance* ng_init_instance() {
 
 void ng_destroy_instance(struct niginxxx_instance* niginxxx) {
 	free(niginxxx->hosts);
+	struct port_list* port_list = niginxxx->port_lists;
+	while(port_list) {
+		struct port_list* fr_port_list = port_list;
+		struct host_list* host_list = port_list->host_lists;
+		port_list = port_list->next;
+		while(host_list) {
+			struct host_list* fr_host_list = host_list;
+			host_list = host_list->next;
+			free(fr_host_list);
+		}
+		free(fr_port_list);
+	}
 	free(niginxxx);
 }

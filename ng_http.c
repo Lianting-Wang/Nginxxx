@@ -38,7 +38,7 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 	sscanf(buf, "%s %s %s", method, url, protocol);
 	printf("%s %s %s\n", method, url, protocol);
 
-	char q[2] = "?";
+	const char q[] = "?";
 	url_path = strtok(url, q);
 	params = strtok(NULL, q);
 	if (params != NULL) {
@@ -53,6 +53,9 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 		len = get_require_line(client_fd, buf, sizeof(buf));
 		if (host[0] == '\0') {
 			sscanf(buf, "Host: %s", host);
+			if (host[0] == '\0') {
+				sscanf(buf, "host: %s", host);
+			}
 		}
 		printf("%s\n", buf);
 		if (content_length == -1) {
@@ -94,16 +97,15 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 		if (S_ISDIR(st.st_mode)){  // If it is a directory, get the index.html file of the corresponding directory
 			strcat(path, hosts[i].index);
 		}
+		handle_response(client_fd, 200, path);
 	}
-
-	handle_response(client_fd, 200, path);
 }
 
 int handle_response(int client_fd, int code, char* path) {
 	int size;
-	char buf[1024];
-	char temp[64];
-	char data[1024];
+	char buf[MAX_TCP_PACKAGE_SIZE];
+	char temp[MAX_TCP_PACKAGE_SIZE];
+	char data[MAX_TCP_PACKAGE_SIZE];
 	struct stat st;
 
 	// Open the file and get the file size
@@ -118,7 +120,7 @@ int handle_response(int client_fd, int code, char* path) {
 			strcat(buf, temp);
 			return send(client_fd, buf, strlen(buf), 0);
 		}
-		handle_response(client_fd, 404, "./error/404.html");
+		return handle_response(client_fd, 404, "./error/404.html");
 	}
 	fstat(fileno(resourse), &st);
 	size = st.st_size;
@@ -173,8 +175,8 @@ int handle_response(int client_fd, int code, char* path) {
 	// Sending headers
 	send(client_fd, buf, strlen(buf), 0);
 	do{
-		int len = fread(data, 1, 1024, resourse);
-		write(client_fd, data, 1024);
+		int len = fread(data, 1, MAX_TCP_PACKAGE_SIZE, resourse);
+		write(client_fd, data, MAX_TCP_PACKAGE_SIZE);
 		// printf("%s", data);
 	}while (!feof(resourse));
 	return 200;
