@@ -1,16 +1,16 @@
 #include "ng_method.h"
 #include "ng_file_util.h"
 
-char * handle_get(char * path) {
+char* handle_get(char* path) {
     int size;
     char buf[1024];
     char temp[64];
     char data[1024];
     struct stat st;
-    FILE * resource = fopen(path, "r");
-    
+    FILE* resource = fopen(path, "r");
+
     if (resource == NULL) {
-        printf("Failed to open file. \n", path);
+        printf("Failed to open file at %s\n", path);
         // TODO handle 404 not found here
     }
     fstat(fileno(resource), &st);
@@ -22,47 +22,74 @@ char * handle_get(char * path) {
     }
 
     // Write message headers
-	strcat(buf, "Server: Nginxxx\r\n");
-	const char point = '.';
-	char* suffix_name;
-	suffix_name = strrchr(path, point);
-	if (strcmp(suffix_name, ".html") == 0) {
-		strcat(buf, "Content-Type: text/html; charset=utf-8\r\n");
-	} else if (strcmp(suffix_name, ".htm") == 0) {
-		strcat(buf, "Content-Type: text/html; charset=utf-8\r\n");
-	} else if (strcmp(suffix_name, ".txt") == 0) {
-		strcat(buf, "Content-Type: text/plain; charset=utf-8\r\n");
-	} else if (strcmp(suffix_name, ".jpg") == 0) {
-		strcat(buf, "Content-Type: image/jpeg\r\n");
-	} else if (strcmp(suffix_name, ".png") == 0) {
-		strcat(buf, "Content-Type: image/png\r\n");
-	} else if (strcmp(suffix_name, ".gif") == 0) {
-		strcat(buf, "Content-Type: image/gif\r\n");
-	}
-	strcat(buf, "Connection: keep-alive\r\n");
-	sprintf(temp, "Content-Length: %d\r\n", size);
-	strcat(buf, temp);
+    strcat(buf, "Server: Nginxxx\r\n");
+    const char point = '.';
+    char* suffix_name;
+    suffix_name = strrchr(path, point);
+    if (strcmp(suffix_name, ".html") == 0) {
+        strcat(buf, "Content-Type: text/html; charset=utf-8\r\n");
+    } else if (strcmp(suffix_name, ".htm") == 0) {
+        strcat(buf, "Content-Type: text/html; charset=utf-8\r\n");
+    } else if (strcmp(suffix_name, ".txt") == 0) {
+        strcat(buf, "Content-Type: text/plain; charset=utf-8\r\n");
+    } else if (strcmp(suffix_name, ".jpg") == 0) {
+        strcat(buf, "Content-Type: image/jpeg\r\n");
+    } else if (strcmp(suffix_name, ".png") == 0) {
+        strcat(buf, "Content-Type: image/png\r\n");
+    } else if (strcmp(suffix_name, ".gif") == 0) {
+        strcat(buf, "Content-Type: image/gif\r\n");
+    }
+    strcat(buf, "Connection: keep-alive\r\n");
+    sprintf(temp, "Content-Length: %d\r\n", size);
+    strcat(buf, temp);
     strcat(buf, "\r\n");
     // Finish writing message header
 
 
 }
 
-int handle_post(int client_fd, char * path, int content_length) {
+int handle_post(int client_fd, char* path, int content_length) {
     char response_header[1024];
     char temp[64];
+    int return_code = 0;
 
     if (content_length < 0) {
+        return_code = BAD_ARG;
         // TODO send error for either no or invalid content-length
-        return -1;
+        // TODO should respond with 411 Legnth Required
+        strcpy(response_header, status_codes_411(HTTP/1.1));
+        strcat(response_header, "Server: Nginxxx\r\n");
+        strcat(response_header, "Connection: keep-alive\r\n");
+        sprintf(temp, "Content-Length: %d\r\n\r\n", 19); // TODO
+        strcat(response_header, temp);
+        if (send(client_fd, response_header, strlen(response_header), 0) == -1) return_code |= CONN_ERR;
+
+        char error_message[] = "411 Length Required";
+        if (send(client_fd, error_message, strlen(error_message), 0) == -1) return_code |= CONN_ERR;
+        return return_code;
     }
 
-    FILE * fp = fopen(path, "r");
-    if (fp) {
-        printf("File already exists\n");
-        // TODO send error for there already exists a file
-        fclose(fp);
+    struct stat st;
+    if (stat(path, &st) == 0) {
+        return_code = FS_CONFLICT;
+        char error_message[] = "409 Conflict";
+
+        printf("entity already exists at requested location.\n");
+        strcpy(response_header, status_codes_409(HTTP/1.1));
+        strcat(response_header, "Server: Nginxxx\r\n");
+
+        strcat(response_header, "Connection: keep-alive\r\n");
+
+        sprintf(temp, "Content-Length: %d\r\n\r\n", 12);
+        strcat(response_header, temp);
+        printf("Constructed header: %s\n", response_header);
+        printf("Constructed Message: %s\n", error_message);
+        if (send(client_fd, response_header, strlen(response_header), 0) == -1) return_code |= CONN_ERR;
+        if (send(client_fd, error_message, 12, 0) == -1) return_code |= CONN_ERR;
+        printf("Finished sending 409\n");
+        return return_code;
     }
+
     int fd = open(path, O_RDWR | O_CREAT);
     if (fd == -1) {
         printf("Failed to create and open a new file at location\n");
@@ -77,11 +104,9 @@ int handle_post(int client_fd, char * path, int content_length) {
 
         char error_message[] = "500 Server Error";
         send(client_fd, error_message, strlen(error_message), 0);
-
-        return -1;
+        return INTERNAL_ERR;
     }
 
-    
     int read_len = 0;
     int write_len = 0;
     int total = 0;
@@ -113,19 +138,21 @@ int handle_post(int client_fd, char * path, int content_length) {
 
     printf("Constructed header: %s\n", response_header);
 
-    send(client_fd, response_header, strlen(response_header), 0);
-    return 0 /* TODO change this status code */;
+    if (send(client_fd, response_header, strlen(response_header), 0) == -1) {
+        return CONN_ERR;
+    }
+    return 0; /* TODO change this status code */
 }
 
 
-int handle_delete(int client_fd, char * path) {
+int handle_delete(int client_fd, char* path) {
     struct stat st;
     int stat_result = stat(path, &st);
     if (stat_result == -1) {
-		printf("stat %s find failed.\n", path);
+        printf("stat %s find failed.\n", path);
         // TODO send error for file does not exists
         return -1;
-	} 
+    }
     if (S_ISDIR(st.st_mode)) { // If it is a directory, get the index.html file of the corresponding directory
         // TODO send error for the destination is a folder
     }

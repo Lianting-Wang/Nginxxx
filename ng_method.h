@@ -30,6 +30,11 @@
 #define TRACE "TRACE"
 #define CONNECT "CONNECT"
 
+#define BAD_ARG 0x00000001
+#define FS_CONFLICT 0x00000002
+#define CONN_ERR 0x00000004
+#define INTERNAL_ERR 0x00000008
+
 int handle_post(int client_fd, char * path, int content_length);
 char * handle_get(char * path);
 

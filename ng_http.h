@@ -18,6 +18,8 @@
 #define status_codes_201(protocol) #protocol " 201 CREATED\r\n"
 #define status_codes_400(protocol) #protocol " 400 BAD REQUEST\r\n"
 #define status_codes_404(protocol) #protocol " 404 NOT FOUND\r\n"
+#define status_codes_409(protocol) #protocol " 409 CONFLICT\r\n"
+#define status_codes_411(protocol) #protocol " 411 Length Required\r\n"
 #define status_codes_500(protocol) #protocol " 500 Internal Sever Error\r\n"
 #define status_codes_501(protocol) #protocol " 501 Method Not Implemented\r\n"
 

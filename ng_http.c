@@ -61,7 +61,7 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 	}while (len > 0);
 	sscanf(host, "%[^:]", host);
 	printf("host: %s\n", host);
-	printf("content_legnth: %d\n", content_length);
+	printf("content_length: %d\n", content_length);
 
 	// Matching virtual host id
 	int i = host_lists->id;
@@ -81,8 +81,8 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 
 	if (strcmp(method, POST) == 0) {
 		printf("handling post...\n");
-		handle_post(client_fd, path, content_length);
-		printf("handled post\n");
+		int code = handle_post(client_fd, path, content_length);
+		printf("handled post %d\n", code);
 		return;
 	}
 
