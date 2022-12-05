@@ -3,7 +3,7 @@
 int append_content_type(char * buf, char * path) {
     const char point = '.';
 	char* suffix_name;
-	suffix_name = strrchr(buf, point);
+	suffix_name = strrchr(path, point);
 	if (suffix_name == NULL) { // Consider this please
         strcat(buf, "Content-Type: text/plain; charset=utf-8\r\n");
     } else if (strcmp(suffix_name, ".html") == 0) {

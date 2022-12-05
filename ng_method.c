@@ -48,7 +48,7 @@ char* handle_get(char* path) {
 
 }
 
-int handle_post(int client_fd, char* path, int content_length) {
+int handle_post(int client_fd, char* path, int content_length, char * url_path) {
     char response_header[1024];
     char temp[64];
     int return_code = 0;
@@ -65,7 +65,7 @@ int handle_post(int client_fd, char* path, int content_length) {
         if (send(client_fd, response_header, strlen(response_header), 0) == -1) return_code |= CONN_ERR;
 
         char error_message[] = "411 Length Required";
-        if (send(client_fd, error_message, strlen(error_message), 0) == -1) return_code |= CONN_ERR;
+        if (send(client_fd, error_message, strlen(error_message) + 1, 0) == -1) return_code |= CONN_ERR;
         return return_code;
     }
 
@@ -85,13 +85,14 @@ int handle_post(int client_fd, char* path, int content_length) {
         printf("Constructed header: %s\n", response_header);
         printf("Constructed Message: %s\n", error_message);
         if (send(client_fd, response_header, strlen(response_header), 0) == -1) return_code |= CONN_ERR;
-        if (send(client_fd, error_message, 12, 0) == -1) return_code |= CONN_ERR;
+        if (send(client_fd, error_message, strlen(error_message) + 1, 0) == -1) return_code |= CONN_ERR;
         printf("Finished sending 409\n");
         return return_code;
     }
 
     int fd = open(path, O_RDWR | O_CREAT);
     if (fd == -1) {
+        return_code = INTERNAL_ERR;
         printf("Failed to create and open a new file at location\n");
         strcpy(response_header, status_codes_500(HTTP/1.1));
         strcat(response_header, "Server: Nginxxx\r\n");
@@ -103,8 +104,8 @@ int handle_post(int client_fd, char* path, int content_length) {
         send(client_fd, response_header, strlen(response_header), 0);
 
         char error_message[] = "500 Server Error";
-        send(client_fd, error_message, strlen(error_message), 0);
-        return INTERNAL_ERR;
+        if(send(client_fd, error_message, strlen(error_message) + 1, 0) == -1) return_code |= CONN_ERR;
+        return return_code;
     }
 
     int read_len = 0;
@@ -127,10 +128,11 @@ int handle_post(int client_fd, char* path, int content_length) {
     strcat(response_header, "Server: Nginxxx\r\n");
 
     strcat(response_header, "Location: "); // specify location
-    strcat(response_header, path);
+    strcat(response_header, url_path);
     strcat(response_header, "\r\n");
 
-    append_content_type(response_header, path);
+    printf("%s|\n", path);
+    append_content_type(response_header, url_path);
     strcat(response_header, "Connection: keep-alive\r\n");
 
     sprintf(temp, "Content-Length: %d\r\n\r\n", 0);
@@ -138,10 +140,11 @@ int handle_post(int client_fd, char* path, int content_length) {
 
     printf("Constructed header: %s\n", response_header);
 
-    if (send(client_fd, response_header, strlen(response_header), 0) == -1) {
-        return CONN_ERR;
-    }
-    return 0; /* TODO change this status code */
+    if (send(client_fd, response_header, strlen(response_header), 0) == -1) return_code |= CONN_ERR;
+    
+    char message[] = "201 Created";
+    if (send(client_fd, message, strlen(message) + 1, 0) == -1) return_code |= CONN_ERR;
+    return return_code; /* TODO change this status code */
 }
 
 

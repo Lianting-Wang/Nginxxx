@@ -84,7 +84,7 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 
 	if (strcmp(method, POST) == 0) {
 		printf("handling post...\n");
-		int code = handle_post(client_fd, path, content_length);
+		int code = handle_post(client_fd, path, content_length, url_path);
 		printf("handled post %d\n", code);
 		return;
 	}

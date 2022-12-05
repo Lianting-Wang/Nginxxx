@@ -26,7 +26,7 @@ int main() {
 			host_pid = fork(); //Create a new child process for each connection
 			if (!host_pid) {
 				handle_request(client_fd, niginxxx->hosts, port_lists->host_lists);
-				// close_socket(client_fd);
+				close_socket(client_fd);
 				exit(0);
 			}
 		}

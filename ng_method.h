@@ -35,7 +35,7 @@
 #define CONN_ERR 0x00000004
 #define INTERNAL_ERR 0x00000008
 
-int handle_post(int client_fd, char * path, int content_length);
+int handle_post(int client_fd, char * path, int content_length, char * url_path);
 char * handle_get(char * path);
 
 #endif
