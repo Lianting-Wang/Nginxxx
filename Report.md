@@ -56,7 +56,7 @@ Run following command
 In another word, checkout the repository at `dev` branch, which has the latest functionality and bug fixes
 
 ### Config
-One can modify the `conf/default.conf` with the following syntax
+One can modify the `conf/default.conf` with the following format
 ```py
 default.conf File Example
 
