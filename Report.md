@@ -55,10 +55,40 @@ Run following command
 
 In another word, checkout the repository at `dev` branch, which has the latest functionality and bug fixes
 
-
 ### Config
 One can modify the `conf/default.conf` with the following syntax
+```py
+default.conf File Example
 
+# not required, representing the maximum number of client connections. 
+# The default value is 1024
+max_connections 1024;
+
+
+# not required, representing the maximum time the client can stay after no operation. 
+# The default value is 120
+keepalive_timeout 120; 
+
+server {
+    #required, represents the port this server is listening on.
+    listen 80
+
+    # not required 
+    # represents the name of the virtual host 
+    # If the name is "_" then this port is the default server. The default value is _
+    server_name _
+
+    # not required 
+    # represents the default file to look for at this path if only the path is provided
+    # The default value is index.html
+    index index.html
+
+    # not required
+    # represents the directory where the subserver file is located
+    # The default value is . /www/default
+    root  ./www/default 
+}
+```
 
 ### Running
 Execute `./run.sh`
