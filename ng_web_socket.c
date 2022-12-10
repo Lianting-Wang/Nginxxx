@@ -12,8 +12,8 @@ int listening_port(int port) {
 	server_addr.sin_addr.s_addr = INADDR_ANY;
 	memset(&(server_addr.sin_zero), 0, 8);
 
-	if (bind(sock_fd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1) return -1;
-	if (listen(sock_fd, BACKLOG) == -1) return -1;
+	if (bind(sock_fd, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1) return -2;
+	if (listen(sock_fd, BACKLOG) == -1) return -3;
 	printf("Socket success! sock_fd=%d listening... \n", sock_fd);
 	return sock_fd;
 }

@@ -1,11 +1,14 @@
 #ifndef NG_MAIN_H
 #define NG_MAIN_H
 
+#include <signal.h>
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "ng_readfile.h"
+#include "ng_http.h"
 
 /* forward declare */
 struct port_list;

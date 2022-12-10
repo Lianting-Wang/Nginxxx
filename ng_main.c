@@ -12,6 +12,7 @@ int main() {
 		if (!pid) {
 			printf("I am pid %d for port %d\n", getpid(), port_lists->port);
 			sock_fd[i] = listening_port(port_lists->port);
+			printf("Returned code: %d\n", sock_fd[i]);
 			break;
 		}
 		port_lists = port_lists->next;
@@ -25,7 +26,7 @@ int main() {
 			host_pid = fork(); //Create a new child process for each connection
 			if (!host_pid) {
 				handle_request(client_fd, niginxxx->hosts, port_lists->host_lists);
-				// close_socket(client_fd);
+				close_socket(client_fd);
 				exit(0);
 			}
 		}
