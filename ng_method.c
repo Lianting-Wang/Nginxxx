@@ -293,11 +293,11 @@ int handle_options(int client_fd, char* path) {
         strcat(response_header, "Allow: HEAD, POST, OPTIONS\r\n");
     }
 
-    if (S_ISDIR(st.st_mode) == 0) { // If it is a directory, get the index.html file of the corresponding directory
+    if (stat_result == 0 && S_ISDIR(st.st_mode) == 0) { // If it is a directory, get the index.html file of the corresponding directory
         strcat(response_header, "Allow: GET, HEAD, OPTIONS\r\n");
     }
 
-    if (S_ISREG(st.st_mode) == 0) { // If it is a file, get the file
+    if (stat_result == 0 && S_ISREG(st.st_mode) == 0) { // If it is a file, get the file
         strcat(response_header, "Allow: GET, HEAD, PUT, DELETE, OPTIONS\r\n");
     }
 
