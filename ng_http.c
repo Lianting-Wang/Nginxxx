@@ -112,16 +112,16 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 	// Determine if a file or directory exists
 	if (stat(path, &st) == -1){
 		printf("stat %s find failed.\n", path);
-		handle_response(client_fd, 404, "./error/404.html");
+		handle_response(client_fd, 404, "./error/404.html", method);
 	}else {
 		if (S_ISDIR(st.st_mode)){  // If it is a directory, get the index.html file of the corresponding directory
 			strcat(path, hosts[i].index);
 		}
-		handle_response(client_fd, 200, path);
+		handle_response(client_fd, 200, path, method);
 	}
 }
 
-int handle_response(int client_fd, int code, char* path) {
+int handle_response(int client_fd, int code, char* path, char method[]) {
 	int size;
 	char buf[MAX_TCP_PACKAGE_SIZE];
 	char temp[MAX_TCP_PACKAGE_SIZE];
@@ -140,7 +140,7 @@ int handle_response(int client_fd, int code, char* path) {
 			strcat(buf, temp);
 			return send(client_fd, buf, strlen(buf), 0);
 		}
-		return handle_response(client_fd, 404, "./error/404.html");
+		return handle_response(client_fd, 404, "./error/404.html", method);
 	}
 	fstat(fileno(resourse), &st);
 	size = st.st_size;
@@ -340,16 +340,23 @@ int handle_response(int client_fd, int code, char* path) {
 		strcat(buf, "Content-Type: text/javascript\r\n");
 	}
 	strcat(buf, "Connection: keep-alive\r\n");
-	sprintf(temp, "Content-Length: %d\r\n\r\n", size);
-	strcat(buf, temp);
 
-	// printf("write:\n%s\n", buf);
-	// Sending headers
-	send(client_fd, buf, strlen(buf), 0);
-	do{
-		int len = fread(data, 1, MAX_TCP_PACKAGE_SIZE, resourse);
-		write(client_fd, data, MAX_TCP_PACKAGE_SIZE);
-		// printf("%s", data);
-	}while (!feof(resourse));
+	if (strcmp(method, GET) == 0) {
+		sprintf(temp, "Content-Length: %d\r\n\r\n", size);
+		strcat(buf, temp);
+
+		// printf("write:\n%s\n", buf);
+		// Sending headers
+		send(client_fd, buf, strlen(buf), 0);
+		do{
+			int len = fread(data, 1, MAX_TCP_PACKAGE_SIZE, resourse);
+			write(client_fd, data, MAX_TCP_PACKAGE_SIZE);
+			// printf("%s", data);
+		}while (!feof(resourse));
+	} else if (strcmp(method, HEAD) == 0) {
+		strcat(buf, "Content-Length: 0\r\n\r\n");
+		send(client_fd, buf, strlen(buf), 0);
+		send(client_fd, "", 1, 0);
+	}
 	return 200;
 }
