@@ -167,9 +167,6 @@ int handle_response(int client_fd, int code, char* path) {
 		case 404:
 			strcpy(buf, status_codes_404(HTTP/1.1));
 			break;
-		case 405:
-			strcpy(buf, status_codes_405(HTTP/1.1));
-			break;
 		case 406:
 			strcpy(buf, status_codes_406(HTTP/1.1));
 			break;
