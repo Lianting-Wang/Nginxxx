@@ -30,6 +30,7 @@ Beside the messurable objective, we also have things we hope to take away from:
 ## Setup & Testing
 
 ### Running
+Execute `make`, to build gcc file "nginxxx" properly.
 Execute `./run.sh`
 If terminal outputs:
 ```
