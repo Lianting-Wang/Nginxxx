@@ -119,20 +119,95 @@ int handle_response(int client_fd, int code, char* path) {
 
 	// Write status line
 	switch (code) {
+		case 100:
+			strcpy(buf, status_codes_100(HTTP/1.1));
+			break;
 		case 200:
 			strcpy(buf, status_codes_200(HTTP/1.1));
+			break;
+		case 201:
+			strcpy(buf, status_codes_201(HTTP/1.1));
+			break;
+		case 202:
+			strcpy(buf, status_codes_202(HTTP/1.1));
+			break;
+		case 204:
+			strcpy(buf, status_codes_204(HTTP/1.1));
+			break;
+		case 206:
+			strcpy(buf, status_codes_206(HTTP/1.1));
+			break;
+		case 301:
+			strcpy(buf, status_codes_301(HTTP/1.1));
+			break;
+		case 302:
+			strcpy(buf, status_codes_302(HTTP/1.1));
+			break;
+		case 303:
+			strcpy(buf, status_codes_303(HTTP/1.1));
+			break;
+		case 304:
+			strcpy(buf, status_codes_304(HTTP/1.1));
+			break;
+		case 307:
+			strcpy(buf, status_codes_307(HTTP/1.1));
+			break;
+		case 308:
+			strcpy(buf, status_codes_308(HTTP/1.1));
 			break;
 		case 400:
 			strcpy(buf, status_codes_400(HTTP/1.1));
 			break;
+		case 401:
+			strcpy(buf, status_codes_401(HTTP/1.1));
+			break;
+		case 403:
+			strcpy(buf, status_codes_403(HTTP/1.1));
+			break;
 		case 404:
 			strcpy(buf, status_codes_404(HTTP/1.1));
+			break;
+		case 405:
+			strcpy(buf, status_codes_405(HTTP/1.1));
+			break;
+		case 406:
+			strcpy(buf, status_codes_406(HTTP/1.1));
+			break;
+		case 407:
+			strcpy(buf, status_codes_407(HTTP/1.1));
+			break;
+		case 409:
+			strcpy(buf, status_codes_409(HTTP/1.1));
+			break;
+		case 410:
+			strcpy(buf, status_codes_410(HTTP/1.1));
+			break;
+		case 412:
+			strcpy(buf, status_codes_412(HTTP/1.1));
+			break;
+		case 416:
+			strcpy(buf, status_codes_416(HTTP/1.1));
+			break;
+		case 418:
+			strcpy(buf, status_codes_418(HTTP/1.1));
+			break;
+		case 451:
+			strcpy(buf, status_codes_451(HTTP/1.1));
 			break;
 		case 500:
 			strcpy(buf, status_codes_500(HTTP/1.1));
 			break;
 		case 501:
 			strcpy(buf, status_codes_501(HTTP/1.1));
+			break;
+		case 502:
+			strcpy(buf, status_codes_502(HTTP/1.1));
+			break;
+		case 503:
+			strcpy(buf, status_codes_503(HTTP/1.1));
+			break;
+		case 504:
+			strcpy(buf, status_codes_504(HTTP/1.1));
 			break;
 	}
 
