@@ -228,6 +228,86 @@ int handle_response(int client_fd, int code, char* path) {
 		strcat(buf, "Content-Type: image/png\r\n");
 	} else if (strcmp(suffix_name, ".gif") == 0) {
 		strcat(buf, "Content-Type: image/gif\r\n");
+	} else if (strcmp(suffix_name, ".pdf") == 0) {
+		strcat(buf, "Content-Type: application/pdf\r\n");
+	} else if (strcmp(suffix_name, ".js") == 0) {
+		strcat(buf, "Content-Type: application/javascript\r\n");
+	} else if (strcmp(suffix_name, ".json") == 0) {
+		strcat(buf, "Content-Type: application/json\r\n");
+	} else if (strcmp(suffix_name, ".xml") == 0) {
+		strcat(buf, "Content-Type: application/xml\r\n");
+	} else if (strcmp(suffix_name, ".zip") == 0) {
+		strcat(buf, "Content-Type: application/zip\r\n");
+	} else if (strcmp(suffix_name, ".tiff") == 0) {
+		strcat(buf, "Content-Type: image/tiff\r\n");
+	} else if (strcmp(suffix_name, ".css") == 0) {
+		strcat(buf, "Content-Type: text/css\r\n");
+	} else if (strcmp(suffix_name, ".csv") == 0) {
+		strcat(buf, "Content-Type: text/csv\r\n");
+	} else if (strcmp(suffix_name, ".mpeg") == 0) {
+		strcat(buf, "Content-Type: video/mpeg\r\n");
+	} else if (strcmp(suffix_name, ".mp4") == 0) {
+		strcat(buf, "Content-Type: video/mp4\r\n");
+	} else if (strcmp(suffix_name, ".qt") == 0) {
+		strcat(buf, "Content-Type: video/quicktime\r\n");
+	} else if (strcmp(suffix_name, ".wmv") == 0) {
+		strcat(buf, "Content-Type: video/x-ms-wmv\r\n");
+	} else if (strcmp(suffix_name, ".avi") == 0) {
+		strcat(buf, "Content-Type: video/x-msvideo\r\n");
+	} else if (strcmp(suffix_name, ".flv") == 0) {
+		strcat(buf, "Content-Type: video/x-flv\r\n");
+	} else if (strcmp(suffix_name, ".webm") == 0) {
+		strcat(buf, "Content-Type: video/webm\r\n");
+	} else if (strcmp(suffix_name, ".apk") == 0) {
+		strcat(buf, "Content-Type: application/vnd.android.package-archive\r\n");
+	} else if (strcmp(suffix_name, ".odt") == 0) {
+		strcat(buf, "Content-Type: application/vnd.oasis.opendocument.text\r\n");
+	} else if (strcmp(suffix_name, ".ods") == 0) {
+		strcat(buf, "Content-Type: application/vnd.oasis.opendocument.spreadsheet\r\n");
+	} else if (strcmp(suffix_name, ".odp") == 0) {
+		strcat(buf, "Content-Type: application/vnd.oasis.opendocument.presentation\r\n");
+	} else if (strcmp(suffix_name, ".odg") == 0) {
+		strcat(buf, "Content-Type: application/vnd.oasis.opendocument.graphics\r\n");
+	} else if (strcmp(suffix_name, ".xls") == 0) {
+		strcat(buf, "Content-Type: application/vnd.ms-excel\r\n");
+	} else if (strcmp(suffix_name, ".xlsx") == 0) {
+		strcat(buf, "Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\r\n");
+	} else if (strcmp(suffix_name, ".ppt") == 0) {
+		strcat(buf, "Content-Type: application/vnd.ms-powerpoint\r\n");
+	} else if (strcmp(suffix_name, ".pptx") == 0) {
+		strcat(buf, "Content-Type: application/vnd.openxmlformats-officedocument.presentationml.presentation\r\n");
+	} else if (strcmp(suffix_name, ".doc") == 0) {
+		strcat(buf, "Content-Type: application/msword\r\n");
+	} else if (strcmp(suffix_name, ".docx") == 0) {
+		strcat(buf, "Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document\r\n");
+	} else if (strcmp(suffix_name, ".xul") == 0) {
+		strcat(buf, "Content-Type: application/vnd.mozilla.xul+xml\r\n");
+	} else if (strcmp(suffix_name, ".jar") == 0) {
+		strcat(buf, "Content-Type: application/java-archive\r\n");
+	} else if (strcmp(suffix_name, ".bin") == 0) {
+		strcat(buf, "Content-Type: application/octet-stream\r\n");
+	} else if (strcmp(suffix_name, ".ogx") == 0) {
+		strcat(buf, "Content-Type: application/ogg\r\n");
+	} else if (strcmp(suffix_name, ".xhtml") == 0) {
+		strcat(buf, "Content-Type: application/xhtml+xml\r\n");
+	} else if (strcmp(suffix_name, ".swf") == 0) {
+		strcat(buf, "Content-Type: application/x-shockwave-flash\r\n");
+	} else if (strcmp(suffix_name, ".jsonld") == 0) {
+		strcat(buf, "Content-Type: application/ld+json\r\n");
+	} else if (strcmp(suffix_name, ".mpga") == 0) {
+		strcat(buf, "Content-Type: audio/mpeg\r\n");
+	} else if (strcmp(suffix_name, ".wma") == 0) {
+		strcat(buf, "Content-Type: audio/x-ms-wma\r\n");
+	} else if (strcmp(suffix_name, ".wav") == 0) {
+		strcat(buf, "Content-Type: audio/x-wav\r\n");
+	} else if (strcmp(suffix_name, ".ico") == 0) {
+		strcat(buf, "Content-Type: image/x-icon\r\n");
+	} else if (strcmp(suffix_name, ".djvu") == 0) {
+		strcat(buf, "Content-Type: image/vnd.djvu\r\n");
+	} else if (strcmp(suffix_name, ".svg") == 0) {
+		strcat(buf, "Content-Type: image/svg+xml\r\n");
+	} else if (strcmp(suffix_name, ".mjs") == 0) {
+		strcat(buf, "Content-Type: text/javascript\r\n");
 	}
 	strcat(buf, "Connection: keep-alive\r\n");
 	sprintf(temp, "Content-Length: %d\r\n\r\n", size);

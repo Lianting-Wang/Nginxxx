@@ -30,7 +30,6 @@
 #define status_codes_401(protocol) #protocol " 401 Unauthorized\r\n"
 #define status_codes_403(protocol) #protocol " 403 Forbidden\r\n"
 #define status_codes_404(protocol) #protocol " 404 NOT FOUND\r\n"
-
 #define status_codes_406(protocol) #protocol " 406 Not Acceptable\r\n"
 #define status_codes_407(protocol) #protocol " 407 Proxy Authentication Required\r\n"
 #define status_codes_409(protocol) #protocol " 409 Conflict\r\n"
