@@ -27,7 +27,38 @@ Besides the measurable objective, we also have things we hope to take away from:
 
 ## Members and contributions
 
+Lianting Wang
+- Designed and initialized the entire project framework
+- Built the config reading system
+- Wrote the socket file so that the program can respond to Http connections
+- Built a sub-process multi-threaded listening system
+- Built the virtual host listening system
+- Built a file reading system and completed the GET method.
+- Completed the response to the HEAD method
+
+Youzhang (Mark) Sun:
+- Implement POST, PUT, DELETE, OPTIONS
+- Decision making on the behaviour of the majority of the methods
+- Implement file system related functionality, including
+  - File creation/appending
+  - Conflict checking
+  - Parent directory creation
+- Debug server functionality
+
 ## Setup & Testing
+
+### Getting the code
+Run following command 
+1. `git clone https://github.com/Lianting-Wang/Nginxxx.git`
+2. `cd Nginxxx`
+3. `git checkout dev`
+
+In another word, checkout the repository at `dev` branch, which has the latest functionality and bug fixes
+
+
+### Config
+One can modify the `conf/default.conf` with the following syntax
+
 
 ### Running
 Execute `./run.sh`
@@ -43,6 +74,49 @@ Then the server is running and listening to port/s
 
 ## Implementation Detail
 
+### Element of Code and Purpose
+
+- #### `ng_main`
+  - Main entry point of the server, spawn child process for each virtual host
+
+- #### `ng_readfile`
+  - For server init
+  - Initiate an nginxxx instance that represents the hosts
+
+- #### `ng_web_socket`
+  - Abstraction for socket binding, listening, and accepting.
+
+- #### `ng_http`
+  - `int handle_request(int client_fd, struct host_instance* hosts, struct host_list* host_lists)`:
+    - This function is called on each new request
+    - It will parse the request line and header section of the incoming HTTP request, make control flow decision based on method, URI, headers.
+    - The function will read up to the body of the request, then call other functions to handle remaining operation
+  - `int get_require_line(int client_fd, char * buf, int size)`
+    - Helper function to get a line of `xxx CRLF` in the HTTP format
+  - `int handle_response(int client_fd, int code, char* path, char method[])`
+    - Handles GET and HEAD methods. 
+    - Given URI and its matching path, attempt to retrieve content at path
+    - Exact behaviour listed below
+
+- #### `ng_file_util`
+  - Helper functions for file system related operations
+  - `int append_content_type(char * buf, char * path)`
+    - Abstraction for adding a `Content-Type` header to responding header
+  - `int mkdir_parent(char * path)`
+    - Create parent directory needed for a file creation
+
+- #### `ng_method`
+  - Main implementation of HTTP methods, most functionality are self explanatory, with their behaviour described later on.
+  - `int handle_get(int client_fd, char * path)`
+  - `int handle_post(int client_fd, char * path, int content_length, char * url_path)`
+  - `int handle_delete(int client_fd, char * path)`
+  - `int handle_put(int client_fd, char * path, int content_length, char * url_path)`
+  - `int handle_options(int client_fd, char * path)`
+  - `int backup_404(int client_fd)`
+    - A hardcoded 404 error message in case the 404.html file cannot be found
+  - `int send_internal_server_err(int client_fd)`
+    - Helper function, abstracting sending 500 server error message
+
 ### Virtual Hosting
 The user can edit the `conf/default.conf` file to setup for more hosts. On web server start, the server attempt to read the said file, and with the correct format, would be able to extinguish virtual host, each identified by a `server { ... }` block in the config file.
 The server then proceeds to start a child process for each of the hosts identified, each with its own socket to listen for requests meant for it.
@@ -57,6 +131,8 @@ As the project is a basic HTTP server, and mainly a proof of concept, we mapped 
   - If the requested path is a file, the server would respond with `200 OK` and the content of the file
   - If the requested path is a directory, the server would check if there exists an index file in the requested directory. If so, the said index file would be returned along with `200 OK`. Otherwise, a `404 NOT FOUND` would be returned
   - If the requested path doesn't exist in any form, a `404 NOT FOUND` would be returned
+- `HEAD`
+  - Return a header that is identical to if the request was called with `GET`, except the body is none
 - `POST`
   - Quoting the RFC standard: 
     >  The actual function performed by the POST method is determined by the server and is usually dependent on the Request-URI
@@ -66,9 +142,13 @@ As the project is a basic HTTP server, and mainly a proof of concept, we mapped 
   - During the process of creating parent directories, if a conflict is reached, namely trying to create a directory when a regular file of the same name already exists, a `409 CONFLICT` would be returned.
   - If the requested path endpoint is occupied, as in either there already exists a file or directory of the same name, a `409 CONFLICT` would be returned, and the POST operation dropped
   - If the writing is done successfully, a `201 CREATED` response would be returned along with the URI that can be used to GET the content in the future
+- `PUT`
+  - If the URL specified in `PUT` is unused, the method behave the same as `POST`
+  - If the URL specified is a directory, a `405 METHOD NOT ALLOWED` response would be returned
+  - If the URL specified is a file, the content inside the body of the request would be appended to the file at the given URI
 - `DELETE`
   - If no file/directory exists at the requested path, a `404 NOT FOUND` would be returned
-  - If the requested path is a directory, a `405 METHOD NOT ALLOWED`
+  - If the requested path is a directory, a `405 METHOD NOT ALLOWED` response would be returned
   - If the requested path is a file, the file would be deleted, and a `204 NO CONTENT` response returned
 - `OPTIONS`
   - Given our interpretation of methods, we categorized possible operations as follows:
@@ -79,8 +159,7 @@ As the project is a basic HTTP server, and mainly a proof of concept, we mapped 
 
 ## Analysis and Discussion
 Overall, we are proud of the prototype we have completed. Technical challenges such as the virtual host and non-blocking request handling have been a success. We were also able to implement some of the major HTTP methods that are used often in the real world, within the context that we've defined for ourselves.
-Due to time constrain, we were not able to implement all HTTP methods, namely `PUT, TRACE, CONNECT`. We expect `PUT` to be easy to implement if we were given slightly more time, as its logic would be similar to `POST`, with some checking of file existing, heading. 
-`TRACE` and `CONNECT` are going to be much more of a challenge, as it involves other HTTP servers, and sadly we did not have time to put great amount of consideration into the subject, but from reading the standard, we expect them to be rather different from the previous methods (such as SSL tunneling specified in RFC). 
+Due to time constrain, we were not able to implement all HTTP methods, namely `TRACE, CONNECT`. `TRACE` and `CONNECT` are going to be a great challenge if we were to implement it, as it involves other HTTP servers, and sadly we did not have time to put great amount of consideration into the subject, but from reading the standard, we expect them to be rather different from the previous methods (such as SSL tunneling specified in RFC). 
 Although not proven with statistic, a consequence of our child process approach is that it might be difficult to scale, as a machine could potentially need to manage tens of thousands of child processes. An alternative to our solution could be using `epoll` to handle request as it comes, and limit to a small number of processes.
 
 However, we deemed the project an success overall. We've sieved through the complex RFC2616 and were able to implement functions we deem necessary, and were able to interact with our web server to get desired results. The project ends up an great exercise for us to refine our knowledge with system programming, and exploration of internet protocol.
