@@ -1,61 +1,6 @@
 #include "ng_method.h"
 #include "ng_file_util.h"
 
-// LIKELY WILL END UP UNUSED
-int handle_get(int client_fd, char* path) {
-    int size;
-    char response_header[1024];
-    char temp[64];
-    char data[1024];
-    struct stat st;
-
-    FILE* resource = fopen(path, "r");
-
-    // Resource not found, handle 404 or redirect
-    if (resource == NULL) {
-        if (strcmp(path, "./error/404.html") == 0) {
-            int backup_result = backup_404(client_fd);
-            if (backup_result != 0) {
-                printf("backup 404 failed.\n");
-            }
-            return backup_result;
-        }
-        else {
-            return handle_get(client_fd, "./error/404.html");
-        }
-    }
-
-    fstat(fileno(resource), &st);
-    size = st.st_size;
-    if (size == 0) { // cannot find file size directly, manually get instead
-        fseek(resource, 0, SEEK_END);
-        size = ftell(resource);
-        fseek(resource, 0, SEEK_SET);
-    }
-
-    // Write status line
-    if (strcmp(path, "./error/404.html") == 0) {
-        strcpy(response_header, status_codes_404("HTTP/1.1"));
-    }
-    else {
-        strcpy(response_header, status_codes_200("HTTP/1.1"));
-    }
-
-    // Write message headers
-    strcat(response_header, "Server: Nginxxx\r\n");
-    append_content_type(response_header, path);
-    strcat(response_header, "Connection: keep-alive\r\n");
-    sprintf(temp, "Content-Length: %d\r\n\r\n", size);
-    strcat(response_header, temp);
-    send(client_fd, response_header, strlen(response_header), 0);
-
-	do{
-		int len = fread(data, 1, MAX_TCP_PACKAGE_SIZE, resource);
-		write(client_fd, data, MAX_TCP_PACKAGE_SIZE);
-		// printf("%s", data);
-	}while (!feof(resource));
-}
-
 int backup_404(int client_fd) {
     char response_header[1024];
     int return_code = 0;
@@ -309,7 +254,8 @@ int handle_options(int client_fd, char* path) {
     return return_code;
 }
 
-int handle_put(int client_fd, char * path, int content_length) {
+
+int handle_put(int client_fd, char * path, int content_length, char * url_path) {
     int return_code = 0;
     char response_header[1024];
     char temp[64];
@@ -331,6 +277,10 @@ int handle_put(int client_fd, char * path, int content_length) {
     struct stat st;
     int stat_result = stat(path, &st);
 
+    if (stat_result == -1) {
+        return handle_post(client_fd, path, content_length, url_path);
+    }
+
     // 405 Method Not Allowed
     if (stat_result == 0 && S_ISDIR(st.st_mode)) { // If it is a directory, get the index.html file of the corresponding directory
         return_code = FS_ERR;
@@ -339,7 +289,7 @@ int handle_put(int client_fd, char * path, int content_length) {
         strcat(response_header, "Server: Nginxxx\r\n");
         strcat(response_header, "Connection: keep-alive\r\n");
         /************************ IMPORTANT **************************/
-        strcat(response_header, "Allow: GET, HEAD\r\n");
+        strcat(response_header, "Allow: GET, HEAD, OPTIONS\r\n");
         /*************************************************************/
         sprintf(temp, "Content-Length: %ld\r\n\r\n", strlen(error_message));
         strcat(response_header, temp);
@@ -348,15 +298,45 @@ int handle_put(int client_fd, char * path, int content_length) {
         return return_code;
     }
 
-    // Need to create a new file
-    if (stat_result == -1) {
-
+    int fd = open(path, O_APPEND | O_WRONLY, 0777);
+    if (fd == -1) {
+        return send_internal_server_err(client_fd);
     }
 
+    int read_len = 0;
+    int write_len = 0;
+    int total = 0;
+    do {
+        char buffer[1024];
+
+        read_len = read(client_fd, buffer, 1024);
+        printf("Read %d bytes\n", read_len);
+        write_len = write(fd, buffer, read_len);
+        printf("Wrote %d bytes\n", write_len);
+        total += write_len;
+    } while (write_len > 0 && total < content_length);
+    close(fd);
+    printf("Finished writing to file\n");
+
+    // ALL GOOD and updated, SEND 204 NO CONTENT
+    strcpy(response_header, status_codes_204(HTTP/1.1));
+    strcat(response_header, "Server: Nginxxx\r\n");
+
+    strcat(response_header, "Location: "); // specify location
+    strcat(response_header, url_path);
+    strcat(response_header, "\r\n");
+    strcat(response_header, "Connection: keep-alive\r\n");
+    sprintf(temp, "Content-Length: %d\r\n\r\n", 0);
+    strcat(response_header, temp);
+
+    if (send(client_fd, response_header, strlen(response_header), 0) == -1) return_code |= CONN_ERR;
+    
+    if (send(client_fd, "", 1, 0) == -1) return_code |= CONN_ERR;
+    return return_code;
 }
 
 int send_internal_server_err(int client_fd) {
-    int return_code = 0;
+    int return_code = INTR_ERR;
     char response_header[1024];
     char temp[64];
 

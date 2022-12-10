@@ -98,7 +98,7 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 
 	if (strcmp(method, PUT) == 0) {
 		printf("handling put...\n");
-		int code = handle_put(client_fd, path, content_length);
+		int code = handle_put(client_fd, path, content_length, url_path);
 		printf("handled put %d\n", code);
 		return;
 	}
@@ -109,14 +109,6 @@ void handle_request(int client_fd, struct host_instance* hosts, struct host_list
 		printf("handled options %d\n", code);
 		return;
 	}
-
-	if (strcmp(method, OPTIONS) == 0) {
-		printf("handling options...\n");
-		int code = handle_options(client_fd, path);
-		printf("handled options %d\n", code);
-		return;
-	}
-
 	// Determine if a file or directory exists
 	if (stat(path, &st) == -1){
 		printf("stat %s find failed.\n", path);

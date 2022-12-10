@@ -38,7 +38,7 @@
 int handle_get(int client_fd, char * path);
 int handle_post(int client_fd, char * path, int content_length, char * url_path);
 int handle_delete(int client_fd, char * path);
-int handle_put(int client_fd, char * path, int content_length);
+int handle_put(int client_fd, char * path, int content_length, char * url_path);
 int handle_options(int client_fd, char * path);
 int backup_404(int client_fd);
 int send_internal_server_err(int client_fd);
