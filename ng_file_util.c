@@ -21,3 +21,30 @@ int append_content_type(char * buf, char * path) {
 	}
     return 0;
 }
+
+// make directory recursively
+int mkdir_parent(char * path) {
+	char cp_path[1024];
+	strcpy(cp_path, path);
+	printf("cp_path: %s\n", cp_path);
+	char * tracker = cp_path;
+	while (*tracker != '\0') {
+		if (*tracker == '/') {
+			*tracker = '\0';
+			struct stat st;
+			if (stat(cp_path, &st) == -1) {
+				if (mkdir(cp_path, 0777) == -1) {
+					return INTR_ERR;
+				}
+			}
+			else {
+				if (S_ISDIR(st.st_mode) == 0) {
+					return FS_ERR;
+				}
+			}
+			*tracker = '/';
+		}
+		tracker++;
+	}	
+	return 0;
+}
