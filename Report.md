@@ -1,3 +1,24 @@
+# Nginxxx Final Project Report
+
+## Table of Content
+- [Nginxxx Final Project Report](#nginxxx-final-project-report)
+  - [Table of Content](#table-of-content)
+  - [Overview](#overview)
+  - [Members and Contributions](#members-and-contributions)
+  - [Setup and Testing](#setup-and-testing)
+    - [Getting the code](#getting-the-code)
+    - [Config](#config)
+    - [Running](#running)
+    - [Example Test Cases](#example-test-cases)
+  - [Main Workflow:](#main-workflow)
+  - [Implementation Detail](#implementation-detail)
+    - [Element of Code and Purpose](#element-of-code-and-purpose)
+    - [Virtual Hosting](#virtual-hosting)
+    - [Non-blocking Request Handling](#non-blocking-request-handling)
+    - [HTTP Method Implementations](#http-method-implementations)
+  - [Analysis and Discussion](#analysis-and-discussion)
+  - [Conclusion](#conclusion)
+
 ## Overview
 The concept of this project was inspired by popular web servers such as Apache HTTP Server and Nginx (after which the project is named). Under the current web development environment, the concept of web server has been largely abstracted away, whether that is by App Engine offered on Google Cloud, or Lambda function as a service on AWS or Firebase by Google.
 
@@ -25,9 +46,9 @@ Besides the measurable objective, we also have things we hope to take away from:
 - Deep understanding of the structure of the HTTP protocol
 - Ability to filter through complex documentation, and implement standards at low-level
 
-## Members and contributions
+## Members and Contributions
 
-Lianting Wang
+**Lianting Wang**
 - Designed and initialized the entire project framework
 - Built the config reading system
 - Wrote the socket file so that the program can respond to Http connections
@@ -36,7 +57,7 @@ Lianting Wang
 - Built a file reading system and completed the GET method.
 - Completed the response to the HEAD method
 
-Youzhang (Mark) Sun:
+**Youzhang (Mark) Sun:**
 - Implement POST, PUT, DELETE, OPTIONS
 - Decision making on the behaviour of the majority of the methods
 - Implement file system related functionality, including
@@ -45,7 +66,7 @@ Youzhang (Mark) Sun:
   - Parent directory creation
 - Debug server functionality
 
-## Setup & Testing
+## Setup and Testing
 
 ### Getting the code
 Run following command 
@@ -63,7 +84,6 @@ default.conf File Example
 # not required, representing the maximum number of client connections. 
 # The default value is 1024
 max_connections 1024;
-
 
 # not required, representing the maximum time the client can stay after no operation. 
 # The default value is 120
@@ -99,34 +119,31 @@ Socket success! sock_fd=x listening...
 ```
 Then the server is running and listening to port/s
 
-### Testing
+### Example Test Cases
 ```
-curl -d '@learn.html' -X POST http://parallax.ca/test.html
-curl -X DELETE http://parallax.ca/test.html
-curl -d '1: hello' -X PUT  http://parallax.ca/test.txt
-curl -d '2: hi' -X PUT http://parallax.ca/test.txt
-curl -d '3: error' -X POST http://parallax.ca/test.txt
-curl -I http://parallax.ca/test.txt
-curl -X DELETE http://parallax.ca/test.txt
-curl -I http://parallax.ca/test.txt
-Lianting Wang — Today at 19:14
+# Test POST
 > curl -d 'This is a test.' -X POST http://127.0.0.1/test.html
 > curl http://127.0.0.1/test.html
 This is a test.
 
+# Clean env
 > curl -X DELETE http://127.0.0.1/test.html
 
+# Test PUT new location
 > curl -d '1: hello; ' -X PUT  http://127.0.0.1/test.txt
 > curl http://127.0.0.1/test.txt
 1: hello; 
 
+# Test PUT append
 > curl -d '2: hi; ' -X PUT http://127.0.0.1/test.txt
 > curl http://127.0.0.1/test.txt
 1: hello; 2: hi; 
 
+# Test POST conflict location
 > curl -d '3: error' -X POST http://127.0.0.1/test.txt
 409 Conflict
 
+# Test HEAD
 > curl -I http://127.0.0.1/test.txt
 HTTP/1.1 200 OK
 Server: Nginxxx
@@ -134,7 +151,7 @@ Content-Type: text/plain; charset=utf-8
 Connection: keep-alive
 Content-Length: 0
 
-
+# Test HEAD non-existing
 > curl -X DELETE http://127.0.0.1/test.txt
 > curl -I http://127.0.0.1/test.txt
 HTTP/1.1 404 NOT FOUND
@@ -145,7 +162,7 @@ Content-Length: 0
 
 ```
 
-## Main workflow:
+## Main Workflow:
 ![Workflow](Flow-Transparent.png)
 
 ## Implementation Detail
@@ -230,15 +247,15 @@ As the project is a basic HTTP server, and mainly a proof of concept, we mapped 
   - Given our interpretation of methods, we categorized possible operations as follows:
     - If the requested path does not exist, then the method possible are: `HEAD, POST, OPTIONS`
     - If the requested path is a directory, then the methods possible are: `GET, HEAD, OPTIONS`
-    - If the requested path is a file, then the methods possible are: `GET, HEAD, DELETE, OPTIONS`
+    - If the requested path is a file, then the methods possible are: `GET, PUT, HEAD, DELETE, OPTIONS`
   
 
 ## Analysis and Discussion
 Overall, we are proud of the prototype we have completed. Technical challenges such as the virtual host and non-blocking request handling have been a success. We were also able to implement some of the major HTTP methods that are used often in the real world, within the context that we've defined for ourselves.
 Due to time constrain, we were not able to implement all HTTP methods, namely `TRACE, CONNECT`. `TRACE` and `CONNECT` are going to be a great challenge if we were to implement it, as it involves other HTTP servers, and sadly we did not have time to put great amount of consideration into the subject, but from reading the standard, we expect them to be rather different from the previous methods (such as SSL tunneling specified in RFC). 
-Although not proven with statistic, a consequence of our child process approach is that it might be difficult to scale, as a machine could potentially need to manage tens of thousands of child processes. An alternative to our solution could be using `epoll` to handle request as it comes, and limit to a small number of processes.
+Although not proven with statistic, a consequence of our child process approach is that it might be difficult to scale, as a machine could potentially need to manage tens of thousands of child processes. An alternative to our solution could be using `epoll` to handle requests as it comes, and limit them to a small number of processes.
 
-However, we deemed the project an success overall. We've sieved through the complex RFC2616 and were able to implement functions we deem necessary, and were able to interact with our web server to get desired results. The project ends up an great exercise for us to refine our knowledge with system programming, and exploration of internet protocol.
+However, we deemed the project a success overall. We've sieved through the complex RFC2616 and were able to implement functions we deem necessary, and were able to interact with our web server to get desired results. The project ends up being a great exercise for us to refine our knowledge of system programming, and exploration of an internet protocol.
 
 The team also discussed areas to explore if this project were to continue. The current server implementation mostly returns content back to the client as it is stored in the server. An upgrade to the server would be to support a sense of "server-side rendering". An example would be the support of PHP rendering: On client request for `/.../xxx.php`, instead of returning the file content, we first evaluate the PHP tag within, this can be done by making a system call and executing a separate rendering executable and piping the output back to our server, and return the resulting HTML.
 
