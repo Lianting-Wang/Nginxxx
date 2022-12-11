@@ -55,16 +55,24 @@ Besides the measurable objective, we also have things we hope to take away from:
 - Built a sub-process multi-threaded listening system
 - Built the virtual host listening system
 - Built a file reading system and completed the GET method.
-- Completed the response to the HEAD method
+- Participate in write up
 
 **Youzhang (Mark) Sun:**
-- Implement POST, PUT, DELETE, OPTIONS
+- Implement POST, DELETE, OPTIONS
 - Decision making on the behaviour of the majority of the methods
 - Implement file system related functionality, including
   - File creation/appending
   - Conflict checking
   - Parent directory creation
 - Debug server functionality
+- Main contributor to final report write up
+
+**Hongxiao Niu**
+- Implement PUT method handling
+- Implement HEAD method
+- Complete status code 
+- Content-Type Recognition
+- Participate in write up
 
 ## Setup and Testing
 
@@ -126,7 +134,7 @@ Then the server is running and listening to port/s
 > curl http://127.0.0.1/test.html
 This is a test.
 
-# Clean env
+# Test DELETE
 > curl -X DELETE http://127.0.0.1/test.html
 
 # Test PUT new location
