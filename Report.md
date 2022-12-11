@@ -99,6 +99,52 @@ Socket success! sock_fd=x listening...
 ```
 Then the server is running and listening to port/s
 
+### Testing
+```
+curl -d '@learn.html' -X POST http://parallax.ca/test.html
+curl -X DELETE http://parallax.ca/test.html
+curl -d '1: hello' -X PUT  http://parallax.ca/test.txt
+curl -d '2: hi' -X PUT http://parallax.ca/test.txt
+curl -d '3: error' -X POST http://parallax.ca/test.txt
+curl -I http://parallax.ca/test.txt
+curl -X DELETE http://parallax.ca/test.txt
+curl -I http://parallax.ca/test.txt
+Lianting Wang — Today at 19:14
+> curl -d 'This is a test.' -X POST http://127.0.0.1/test.html
+> curl http://127.0.0.1/test.html
+This is a test.
+
+> curl -X DELETE http://127.0.0.1/test.html
+
+> curl -d '1: hello; ' -X PUT  http://127.0.0.1/test.txt
+> curl http://127.0.0.1/test.txt
+1: hello; 
+
+> curl -d '2: hi; ' -X PUT http://127.0.0.1/test.txt
+> curl http://127.0.0.1/test.txt
+1: hello; 2: hi; 
+
+> curl -d '3: error' -X POST http://127.0.0.1/test.txt
+409 Conflict
+
+> curl -I http://127.0.0.1/test.txt
+HTTP/1.1 200 OK
+Server: Nginxxx
+Content-Type: text/plain; charset=utf-8
+Connection: keep-alive
+Content-Length: 0
+
+
+> curl -X DELETE http://127.0.0.1/test.txt
+> curl -I http://127.0.0.1/test.txt
+HTTP/1.1 404 NOT FOUND
+Server: Nginxxx
+Content-Type: text/html; charset=utf-8
+Connection: keep-alive
+Content-Length: 0
+
+```
+
 ## Main workflow:
 ![Workflow](Flow-Transparent.png)
 
